@@ -24,7 +24,7 @@ set(CMAKE_OSX_ARCHITECTURES
 )
 
 # Sets a few variables, like PROJECT_NAME. VERSION is needed by JUCE.
-project(AudioPlugin)
+project(distorter)
 
 # Set the C++ standard only if this project is standalone;
 # otherwise, let clients decide.
@@ -89,9 +89,9 @@ endif()
 
 # Adds a plugin target (that's basically what the Projucer does).
 juce_add_plugin(
-  AudioPlugin
+  distorter_plugin
   COMPANY_NAME
-  "MyCompany" # change this
+  "lchaudio" # change this
   IS_SYNTH
   FALSE # may change this
   NEEDS_MIDI_INPUT
@@ -99,16 +99,16 @@ juce_add_plugin(
   NEEDS_MIDI_OUTPUT
   FALSE # may change this
   PLUGIN_MANUFACTURER_CODE
-  Mcmp # change this (for max compatibility, first letter must be uppercase, remaining lowercase)
+  Lcha # change this (for max compatibility, first letter must be uppercase, remaining lowercase)
   PLUGIN_CODE
-  Expl # change this (for max compatibility, first letter must be uppercase, remaining lowercase)
+  Dstr # change this (for max compatibility, first letter must be uppercase, remaining lowercase)
   FORMATS
   AAX
   AU
   Standalone
   VST3
   PRODUCT_NAME
-  "YourPluginName" # change this
+  "Distorter" # change this
   VERSION
   0.0.0 # 0.0.0 forces AU host to always rescan the plugin. Change this before releasing
   COPY_PLUGIN_AFTER_BUILD
@@ -117,40 +117,40 @@ juce_add_plugin(
 )
 
 # These definitions are recommended by JUCE
-target_compile_definitions(AudioPlugin PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
+target_compile_definitions(distorter_plugin PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
 
 # We want to have a "library" target with PluginProcessor and PluginEditor to use in plugins and in tests.
 # Library targets that use JUCE modules non-PRIVATEly should be created as JUCE module themselves,
 # not as static or shared libraries. Otherwise, you risk buggy JUCE build configuration.
 # This is unlikely on small projects, but we want to use the best practices from the start
 # (and migrating to JUCE modules at a late development stage is a nightmare, trust me).
-juce_add_module(audio_plugin ALIAS_NAMESPACE my_company)
+juce_add_module(distorter ALIAS_NAMESPACE distorter)
 
 # In the following, we re-export some of the compile-time definitions derived from arguments of
 # juce_add_plugin(). This is necessary to maintain consistent behavior in built plugins and in tests.
-# Check juce/extras/Build/CMake/JUCEUtils.cmake to see how they are defined for the AudioPlugin target.
+# Check juce/extras/Build/CMake/JUCEUtils.cmake to see how they are defined for the distorter_plugin target.
 # Alternatively, you could use
-# target_compile_definitions(AudioPluginTest PRIVATE $<TARGET_PROPERTY:AudioPlugin,COMPILE_DEFINITIONS>)
+# target_compile_definitions(AudioPluginTest PRIVATE $<TARGET_PROPERTY:distorter_plugin,COMPILE_DEFINITIONS>)
 # in the test/CMakeLists.txt file, but I find it more risky to blindly export all compile
-# definitions for all targets using audio_plugin
+# definitions for all targets using distorter.
 # (1. you can forget to do it 2. you don't know what you're defining)
-# than to re-export the meaningful ones for audio_plugin and just link against the module to use it.
+# than to re-export the meaningful ones for distorter and just link against the module to use it.
 target_compile_definitions(
-  audio_plugin
-  INTERFACE JUCE_PLUGIN_NAME="$<TARGET_PROPERTY:AudioPlugin,JUCE_PLUGIN_NAME>"
-            JUCE_IS_MIDI_EFFECT=$<BOOL:$<TARGET_PROPERTY:AudioPlugin,JUCE_IS_MIDI_EFFECT>>
-            JUCE_IS_SYNTH=$<BOOL:$<TARGET_PROPERTY:AudioPlugin,JUCE_IS_SYNTH>>
-            JUCE_NEEDS_MIDI_INPUT=$<BOOL:$<TARGET_PROPERTY:AudioPlugin,JUCE_NEEDS_MIDI_INPUT>>
-            JUCE_NEEDS_MIDI_OUTPUT=$<BOOL:$<TARGET_PROPERTY:AudioPlugin,JUCE_NEEDS_MIDI_OUTPUT>>
+  distorter
+  INTERFACE JUCE_PLUGIN_NAME="$<TARGET_PROPERTY:distorter_plugin,JUCE_PLUGIN_NAME>"
+            JUCE_IS_MIDI_EFFECT=$<BOOL:$<TARGET_PROPERTY:distorter_plugin,JUCE_IS_MIDI_EFFECT>>
+            JUCE_IS_SYNTH=$<BOOL:$<TARGET_PROPERTY:distorter_plugin,JUCE_IS_SYNTH>>
+            JUCE_NEEDS_MIDI_INPUT=$<BOOL:$<TARGET_PROPERTY:distorter_plugin,JUCE_NEEDS_MIDI_INPUT>>
+            JUCE_NEEDS_MIDI_OUTPUT=$<BOOL:$<TARGET_PROPERTY:distorter_plugin,JUCE_NEEDS_MIDI_OUTPUT>>
 )
 
 # Enables strict C++ warnings and treats warnings as errors.
-target_compile_options(audio_plugin INTERFACE "${PROJECT_WARNINGS_CXX}")
+target_compile_options(distorter INTERFACE "${PROJECT_WARNINGS_CXX}")
 
 # We need to link the plugin targets with the module containing our code.
 target_link_libraries(
-  AudioPlugin
-  PRIVATE my_company::audio_plugin
+  distorter_plugin
+  PRIVATE distorter::distorter
   PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags
 )
 

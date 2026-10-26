@@ -1,4 +1,4 @@
-namespace audio_plugin {
+namespace distorter {
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p), processorRef(p) {
   juce::ignoreUnused(processorRef);
@@ -23,4 +23,4 @@ void PluginEditor::resized() {
   // This is generally where you'll want to lay out the positions of any
   // subcomponents in your editor..
 }
-}  // namespace audio_plugin
+}  // namespace distorter

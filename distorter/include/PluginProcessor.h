@@ -1,6 +1,6 @@
 #pragma once
 
-namespace audio_plugin {
+namespace distorter {
 class PluginProcessor : public juce::AudioProcessor {
 public:
   PluginProcessor();
@@ -31,8 +31,16 @@ public:
 
   void getStateInformation(juce::MemoryBlock& destData) override;
   void setStateInformation(const void* data, int sizeInBytes) override;
+  
+  Parameters& getParameterRefs() noexcept {
+    return parameters;
+  }
 
 private:
+
+  Distorter distorter;
+  Parameters parameters{*this};
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };
-}  // namespace audio_plugin
+}  // namespace distorter

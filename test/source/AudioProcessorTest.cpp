@@ -1,8 +1,8 @@
-#include <audio_plugin/audio_plugin.h>
+#include <distorter/distorter.h>
 #include <gtest/gtest.h>
 
-namespace audio_plugin {
+namespace distorter {
 TEST(AudioProcessor, Foo) {
   PluginProcessor processor{};
 }
-}  // namespace audio_plugin
+}  // namespace distorter

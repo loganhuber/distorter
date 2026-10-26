@@ -3,10 +3,10 @@
 
 BEGIN_JUCE_MODULE_DECLARATION
 
-   ID:            audio_plugin
+   ID:            distorter
    vendor:        WolfSound
    version:       0.1.0
-   name:          Audio Plugin
+   name:          Distorter
    description:   Plugin core
    dependencies:  juce_audio_utils
 
@@ -19,8 +19,13 @@ END_JUCE_MODULE_DECLARATION
 */
 
 #pragma once
-
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
+
+#include <ranges>
+
+#include "include/Distorter.h"
+#include "include/Parameters.h"
 #include "include/PluginProcessor.h"
 #include "include/PluginEditor.h"
 

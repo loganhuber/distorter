@@ -1,4 +1,4 @@
-namespace audio_plugin {
+namespace distorter {
 PluginProcessor::PluginProcessor()
     : AudioProcessor(
           BusesProperties()
@@ -136,7 +136,7 @@ bool PluginProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* PluginProcessor::createEditor() {
-  return new PluginEditor(*this);
+  return new juce::GenericAudioProcessorEditor(*this);
 }
 
 void PluginProcessor::getStateInformation(juce::MemoryBlock& destData) {
@@ -152,10 +152,13 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes) {
   // call.
   juce::ignoreUnused(data, sizeInBytes);
 }
-}  // namespace audio_plugin
+
+
+}  // namespace distorter
 
 // This creates new instances of the plugin.
 // This function definition must be in the global namespace.
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
-  return new audio_plugin::PluginProcessor();
+  return new distorter::PluginProcessor();
 }
+
