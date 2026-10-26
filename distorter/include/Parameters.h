@@ -6,6 +6,7 @@ namespace distorter {
             explicit Parameters(juce::AudioProcessor&);
 
             juce::AudioParameterFloat& gain;
+            juce::AudioParameterFloat& distortion;
         
             JUCE_DECLARE_NON_COPYABLE(Parameters)
             JUCE_DECLARE_NON_MOVEABLE(Parameters)

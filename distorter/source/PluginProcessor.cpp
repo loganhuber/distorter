@@ -133,6 +133,7 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   //   // ..do something to the data...
   // }
   distorter.setGain(parameters.gain.get());
+  distorter.setDistortion(parameters.distortion.get());
   distorter.process(buffer);
 }
 
