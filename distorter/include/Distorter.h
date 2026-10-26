@@ -9,7 +9,7 @@ namespace distorter {
 
         void prepare(double sampleRate, int expectedMaxFramesPerBlock) {
             outputGain.reset(sampleRate, 0.1f);
-
+            juce::ignoreUnused(expectedMaxFramesPerBlock);
             // const juce::dsp::ProcessSpec processSpec {
             //     .sampleRate = sampleRate,
             //     .maximumBlockSize = static_cast<juce::uint32>(expectedMaxFramesPerBlock),
