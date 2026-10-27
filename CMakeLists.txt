@@ -88,6 +88,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 # Adds a plugin target (that's basically what the Projucer does).
+set(PLUGIN_NAME "distorter_plugin")
 juce_add_plugin(
   distorter_plugin
   COMPANY_NAME

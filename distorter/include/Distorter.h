@@ -38,7 +38,7 @@ namespace distorter {
                 for (const auto channelIndex : std::views::iota(0, buffer.getNumChannels())) {
 
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
-                    const auto shape = std::tanh(inputSample * nextOutputDistortion);
+                    const auto shape = std::atan(inputSample * nextOutputDistortion);
                     const auto drivenSample = shape * nextOutputGain;
                     const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
 

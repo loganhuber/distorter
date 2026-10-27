@@ -1,7 +1,8 @@
 #include "distorter.h"
-
-#include "source/PluginProcessor.cpp"
 #include "source/Parameters.cpp"
+
+#include "source/JsonSerializer.cpp"
+#include "source/PluginProcessor.cpp"
 #include "source/PluginEditor.cpp"
 
 
