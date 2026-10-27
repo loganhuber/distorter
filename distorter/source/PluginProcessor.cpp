@@ -71,7 +71,7 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
   // Use this method as the place to do any pre-playback
   // initialisation that you need..
   // juce::ignoreUnused(sampleRate, samplesPerBlock);
-  distorter.prepare(sampleRate, samplesPerBlock);
+  distorter.prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels());
 }
 
 void PluginProcessor::releaseResources() {
@@ -132,6 +132,8 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
   //   // ..do something to the data...
   // }
+
+  distorter.setHighPass(parameters.highPassFreq.get());
   distorter.setGain(parameters.gain.get());
   distorter.setDistortion(parameters.distortion.get());
   distorter.setMix(static_cast<float>(parameters.mix.get() / 100.0f));

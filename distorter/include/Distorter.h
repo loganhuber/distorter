@@ -3,7 +3,9 @@
 namespace distorter {
     class Distorter {
         public: 
-          void setGain(float gain) {
+
+
+        void setGain(float gain) {
                 outputGain.setTargetValue(juce::Decibels::decibelsToGain(gain));
         }
 
@@ -15,17 +17,29 @@ namespace distorter {
             outputMix.setTargetValue(juce::jlimit(0.f, 1.f, mix));
         }
 
-        void prepare(double sampleRate, int expectedMaxFramesPerBlock) {
+        void setHighPass(float highPass) {
+            highPassFreq.setTargetValue(highPass);
+        }
+
+
+
+        
+
+        void prepare(double sampleRate, int expectedMaxFramesPerBlock, int numChannels) {
             outputGain.reset(sampleRate, 0.1f);
             outputDistortion.reset(sampleRate, 0.1f);
             outputMix.reset(sampleRate, 1);
+            highPassFreq.reset(sampleRate, .6f);
 
-            juce::ignoreUnused(expectedMaxFramesPerBlock);
-            // const juce::dsp::ProcessSpec processSpec {
-            //     .sampleRate = sampleRate,
-            //     .maximumBlockSize = static_cast<juce::uint32>(expectedMaxFramesPerBlock),
-            //     .numChannels = 1u,
-            // };
+            const juce::dsp::ProcessSpec processSpec {
+                .sampleRate = sampleRate,
+                .maximumBlockSize = static_cast<juce::uint32>(expectedMaxFramesPerBlock),
+                .numChannels = static_cast<juce::uint32>(numChannels),
+            };
+
+            highPassFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
+            highPassFilter.setCutoffFrequency(highPassFreq.getCurrentValue());
+            highPassFilter.prepare(processSpec);
         }
 
         void process(juce::AudioBuffer<float>& buffer) noexcept {
@@ -35,10 +49,15 @@ namespace distorter {
                 const auto nextOutputDistortion = outputDistortion.getNextValue();
                 const auto mix = outputMix.getNextValue();
 
+                const auto nextHighPassFreq = highPassFreq.getNextValue();
+                highPassFilter.setCutoffFrequency(nextHighPassFreq);
+
                 for (const auto channelIndex : std::views::iota(0, buffer.getNumChannels())) {
 
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
-                    const auto shape = std::atan(inputSample * nextOutputDistortion);
+
+                    const auto filtered = highPassFilter.processSample(channelIndex, inputSample);
+                    const auto shape = std::atan(filtered * nextOutputDistortion);
                     const auto drivenSample = shape * nextOutputGain;
                     const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
 
@@ -54,6 +73,12 @@ namespace distorter {
         juce::SmoothedValue<float> outputGain = 1.f;
         juce::SmoothedValue<float> outputDistortion = 1.f;
         juce::SmoothedValue<float> outputMix = 1;
+        juce::SmoothedValue<float> highPassFreq = 20;
+
+        juce::dsp::StateVariableTPTFilter<float> highPassFilter;
+
+        // juce::dsp::StateVariableTPTFilter<float> highPassRight;
+        // juce::dsp::StateVariableTPTFilter<float> highPassLeft;
 
     }; 
 

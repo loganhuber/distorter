@@ -52,6 +52,21 @@ namespace distorter {
 
             return addParameterToProcessor(processor, std::move(parameter));
         }
+
+        juce::AudioParameterFloat& createHighPassFreqParameter(juce::AudioProcessor& processor) {
+            constexpr int versionHint = 1;
+
+            auto parameter = std::make_unique<juce::AudioParameterFloat>(
+                juce::ParameterID("Highpass", versionHint),
+                "High Pass",
+                juce::NormalisableRange{20.f, 20000.f, 1.f},
+                20.f,
+                juce::AudioParameterFloatAttributes{}.withLabel("Hz")
+            );
+
+            return addParameterToProcessor(processor, std::move(parameter));
+
+        }
     }
 
 
@@ -59,7 +74,8 @@ namespace distorter {
     Parameters::Parameters(juce::AudioProcessor& processor) :
     gain{createGainParameter(processor)},
     distortion{createDistortionParameter(processor)}, 
-    mix{createMixParameter(processor)}
+    mix{createMixParameter(processor)},
+    highPassFreq{createHighPassFreqParameter(processor)}
     {
         juce::ignoreUnused(processor);
     }
