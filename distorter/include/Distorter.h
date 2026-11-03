@@ -66,13 +66,13 @@ namespace distorter {
 
                     switch (flavor) {
                         case SaturationType::atan:
-                            shape = juce::jlimit(-1.f, 1.f, std::atan(filtered * nextOutputDistortion));
+                            shape = juce::jlimit(-1.f, 1.f, std::atan(nextOutputDistortion * nextOutputDistortion * filtered));
                             break;
                         case SaturationType::tanh:
-                            shape = juce::jlimit(-1.f, 1.f, std::tanh(filtered * nextOutputDistortion));
+                            shape = juce::jlimit(-1.f, 1.f, std::tanh(nextOutputDistortion * nextOutputDistortion * filtered));
                             break;
                         case SaturationType::heavy:
-                            shape = juce::jlimit(-1.f, 1.f, std::atan(filtered * nextOutputDistortion * nextOutputDistortion));
+                            shape = juce::jlimit(-1.f, 1.f, std::atan(nextOutputDistortion * nextOutputDistortion * nextOutputDistortion * filtered));
                     }
 
                     const auto drivenSample = shape * nextOutputGain;
@@ -93,6 +93,7 @@ namespace distorter {
         juce::SmoothedValue<float> outputMix = 1;
         juce::SmoothedValue<float> highPassFreq = 20;
 
+        // juce::dsp::Gain<float> distortionCompensation = 0;
         juce::dsp::StateVariableTPTFilter<float> highPassFilter;
 
         SaturationType flavor = SaturationType::atan;
