@@ -59,7 +59,7 @@ namespace distorter {
             auto parameter = std::make_unique<juce::AudioParameterFloat>(
                 juce::ParameterID("Highpass", versionHint),
                 "High Pass",
-                juce::NormalisableRange{20.f, 20000.f, 1.f},
+                juce::NormalisableRange{20.f, 500.f, 1.f},
                 20.f,
                 juce::AudioParameterFloatAttributes{}.withLabel("Hz")
             );
