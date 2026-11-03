@@ -4,6 +4,14 @@ namespace distorter {
     class Distorter {
         public: 
 
+        enum class SaturationType {
+            atan,
+            tanh
+        };
+
+        void setSaturationType(SaturationType saturationType) {
+            flavor = saturationType;
+        }
 
         void setGain(float gain) {
                 outputGain.setTargetValue(juce::Decibels::decibelsToGain(gain));
@@ -20,10 +28,6 @@ namespace distorter {
         void setHighPass(float highPass) {
             highPassFreq.setTargetValue(highPass);
         }
-
-
-
-        
 
         void prepare(double sampleRate, int expectedMaxFramesPerBlock, int numChannels) {
             outputGain.reset(sampleRate, 0.1f);
@@ -51,15 +55,26 @@ namespace distorter {
 
                 const auto nextHighPassFreq = highPassFreq.getNextValue();
                 highPassFilter.setCutoffFrequency(nextHighPassFreq);
-
+                
                 for (const auto channelIndex : std::views::iota(0, buffer.getNumChannels())) {
-
+                    
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
-
                     const auto filtered = highPassFilter.processSample(channelIndex, inputSample);
-                    const auto shape = std::atan(filtered * nextOutputDistortion);
+                    
+                    auto shape = 0.0f;
+
+                    switch (flavor) {
+                        case SaturationType::atan:
+                            shape = std::atan(filtered * nextOutputDistortion);
+                            break;
+                        case SaturationType::tanh:
+                            shape = std::tanh(filtered * nextOutputDistortion);
+                            break;
+                    }
+
                     const auto drivenSample = shape * nextOutputGain;
                     const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
+
 
                     const auto outputSample = inputSample + mix * (wet - inputSample);
 
@@ -77,8 +92,8 @@ namespace distorter {
 
         juce::dsp::StateVariableTPTFilter<float> highPassFilter;
 
-        // juce::dsp::StateVariableTPTFilter<float> highPassRight;
-        // juce::dsp::StateVariableTPTFilter<float> highPassLeft;
+        SaturationType flavor = SaturationType::atan;
+
 
     }; 
 

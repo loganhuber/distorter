@@ -65,7 +65,19 @@ namespace distorter {
             );
 
             return addParameterToProcessor(processor, std::move(parameter));
+        }
 
+        juce::AudioParameterChoice& createSaturationTypeParameter(juce::AudioProcessor& processor) {
+            constexpr int versionHint = 1;
+
+            auto parameter = std::make_unique<juce::AudioParameterChoice>(
+                juce::ParameterID("Saturation", versionHint),
+                "Saturation",
+                juce::StringArray{"Atan", "Tanh"},
+                0
+            );
+
+            return addParameterToProcessor(processor, std::move(parameter));
         }
     }
 
@@ -75,7 +87,8 @@ namespace distorter {
     gain{createGainParameter(processor)},
     distortion{createDistortionParameter(processor)}, 
     mix{createMixParameter(processor)},
-    highPassFreq{createHighPassFreqParameter(processor)}
+    highPassFreq{createHighPassFreqParameter(processor)},
+    saturationType{createSaturationTypeParameter(processor)}
     {
         juce::ignoreUnused(processor);
     }

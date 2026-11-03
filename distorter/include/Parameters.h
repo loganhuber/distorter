@@ -9,6 +9,7 @@ namespace distorter {
             juce::AudioParameterFloat& distortion;
             juce::AudioParameterInt& mix;
             juce::AudioParameterFloat& highPassFreq;
+            juce::AudioParameterChoice& saturationType;
         
             JUCE_DECLARE_NON_COPYABLE(Parameters)
             JUCE_DECLARE_NON_MOVEABLE(Parameters)
