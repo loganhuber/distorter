@@ -129,6 +129,8 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     case 1:
       distorter.setSaturationType(Distorter::SaturationType::tanh);
       break;
+    case 2:
+      distorter.setSaturationType(Distorter::SaturationType::heavy);
   }
 
   distorter.process(buffer);

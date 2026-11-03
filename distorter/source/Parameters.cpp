@@ -30,7 +30,7 @@ namespace distorter {
             auto parameter = std::make_unique<juce::AudioParameterFloat>(
                 juce::ParameterID("Distortion", versionHint), 
                 "Distortion", 
-                juce::NormalisableRange{0.0f, 24.f, 0.1f},
+                juce::NormalisableRange{0.0f, 34.f, 0.1f},
                 1.f,
                 juce::AudioParameterFloatAttributes{}.withLabel("dB")
             );
@@ -73,7 +73,7 @@ namespace distorter {
             auto parameter = std::make_unique<juce::AudioParameterChoice>(
                 juce::ParameterID("Saturation", versionHint),
                 "Saturation",
-                juce::StringArray{"Atan", "Tanh"},
+                juce::StringArray{"Atan", "Tanh", "Heavy"},
                 0
             );
 

@@ -6,7 +6,8 @@ namespace distorter {
 
         enum class SaturationType {
             atan,
-            tanh
+            tanh,
+            heavy
         };
 
         void setSaturationType(SaturationType saturationType) {
@@ -65,18 +66,20 @@ namespace distorter {
 
                     switch (flavor) {
                         case SaturationType::atan:
-                            shape = std::atan(filtered * nextOutputDistortion);
+                            shape = juce::jlimit(-1.f, 1.f, std::atan(filtered * nextOutputDistortion));
                             break;
                         case SaturationType::tanh:
-                            shape = std::tanh(filtered * nextOutputDistortion);
+                            shape = juce::jlimit(-1.f, 1.f, std::tanh(filtered * nextOutputDistortion));
                             break;
+                        case SaturationType::heavy:
+                            shape = juce::jlimit(-1.f, 1.f, std::atan(filtered * nextOutputDistortion * nextOutputDistortion));
                     }
 
                     const auto drivenSample = shape * nextOutputGain;
-                    const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
+                    // const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
 
 
-                    const auto outputSample = inputSample + mix * (wet - inputSample);
+                    const auto outputSample = inputSample + mix * (drivenSample - inputSample);
 
                     buffer.setSample(channelIndex, frameIndex, outputSample);
                 }
