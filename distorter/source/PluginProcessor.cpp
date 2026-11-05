@@ -121,6 +121,8 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   distorter.setGain(parameters.gain.get());
   distorter.setDistortion(parameters.distortion.get());
   distorter.setMix(static_cast<float>(parameters.mix.get() / 100.0f));
+  distorter.setMidGainDb(parameters.midControl.get());
+  
 
   switch (parameters.saturationType.getIndex()) {
     case 0:

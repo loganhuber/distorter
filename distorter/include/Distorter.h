@@ -10,6 +10,10 @@ namespace distorter {
             heavy
         };
 
+        void setMidGainDb(float gainDb) {
+            midGainDb.setTargetValue(gainDb);
+        }
+
         void setSaturationType(SaturationType saturationType) {
             flavor = saturationType;
         }
@@ -35,6 +39,8 @@ namespace distorter {
             outputDistortion.reset(sampleRate, 0.1f);
             outputMix.reset(sampleRate, 1);
             highPassFreq.reset(sampleRate, .6f);
+            midGainDb.reset(sampleRate, .1f);
+            sampleRateHz = sampleRate;
 
             const juce::dsp::ProcessSpec processSpec {
                 .sampleRate = sampleRate,
@@ -45,9 +51,34 @@ namespace distorter {
             highPassFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
             highPassFilter.setCutoffFrequency(highPassFreq.getCurrentValue());
             highPassFilter.prepare(processSpec);
+
+            midGainDb.setCurrentAndTargetValue(0.0f);
+
+            const float neutralGain = 1.0f;
+
+            auto coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                sampleRate,
+                midCenterFreqHz,
+                midQ,
+                neutralGain
+            );
+
+            for (auto& midFilter : midFilters) {
+                midFilter.coefficients = coefficients;
+                midFilter.prepare(processSpec);
+            }
+            
         }
 
         void process(juce::AudioBuffer<float>& buffer) noexcept {
+
+            midGainDb.skip(buffer.getNumSamples());
+            
+            const float gainFactor = juce::Decibels::decibelsToGain(midGainDb.getCurrentValue());
+            *midFilters[0].coefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
+                sampleRateHz, midCenterFreqHz, midQ, gainFactor
+            );
+
             for (const auto frameIndex : std::views::iota(0, buffer.getNumSamples())) {
 
                 const auto nextOutputGain = outputGain.getNextValue();
@@ -56,11 +87,14 @@ namespace distorter {
 
                 const auto nextHighPassFreq = highPassFreq.getNextValue();
                 highPassFilter.setCutoffFrequency(nextHighPassFreq);
+
+                
                 
                 for (const auto channelIndex : std::views::iota(0, buffer.getNumChannels())) {
                     
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
-                    const auto filtered = highPassFilter.processSample(channelIndex, inputSample);
+                    const auto highPassed = highPassFilter.processSample(channelIndex, inputSample);
+                    const auto filtered = midFilters[static_cast<size_t>(channelIndex)].processSample(highPassed);
                     
                     auto shape = 0.0f;
 
@@ -95,6 +129,13 @@ namespace distorter {
 
         // juce::dsp::Gain<float> distortionCompensation = 0;
         juce::dsp::StateVariableTPTFilter<float> highPassFilter;
+
+        juce::SmoothedValue<float> midGainDb = 1.0f;
+        std::array<juce::dsp::IIR::Filter<float>, 2> midFilters;
+
+        double sampleRateHz = 0.0;
+        const float midCenterFreqHz = 1000.0f;
+        const float midQ = 1.f;
 
         SaturationType flavor = SaturationType::atan;
 
