@@ -73,8 +73,8 @@ namespace distorter {
         void process(juce::AudioBuffer<float>& buffer) noexcept {
 
             midGainDb.skip(buffer.getNumSamples());
-            
             const float gainFactor = juce::Decibels::decibelsToGain(midGainDb.getCurrentValue());
+
             *midFilters[0].coefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
                 sampleRateHz, midCenterFreqHz, midQ, gainFactor
             );
@@ -88,8 +88,6 @@ namespace distorter {
                 const auto nextHighPassFreq = highPassFreq.getNextValue();
                 highPassFilter.setCutoffFrequency(nextHighPassFreq);
 
-                
-                
                 for (const auto channelIndex : std::views::iota(0, buffer.getNumChannels())) {
                     
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
@@ -110,9 +108,6 @@ namespace distorter {
                     }
 
                     const auto drivenSample = shape * nextOutputGain;
-                    // const auto wet = juce::jlimit(-1.f, 1.f, drivenSample);
-
-
                     const auto outputSample = inputSample + mix * (drivenSample - inputSample);
 
                     buffer.setSample(channelIndex, frameIndex, outputSample);

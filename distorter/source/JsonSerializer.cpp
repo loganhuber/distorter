@@ -9,6 +9,7 @@ namespace distorter {
         int mix;
         float highPassFreq;
         int saturationType; // index, not the string name
+        float midControl;
 
       static constexpr auto marshallingVersion = 1;
 
@@ -32,7 +33,8 @@ namespace distorter {
                 named("distortion", t.distortion), 
                 named("mix", t.mix),
                 named("highPassFreq", t.highPassFreq),
-                named("saturationType", t.saturationType)
+                named("saturationType", t.saturationType),
+                named("midControl", t.midControl)
             );
 
       }
@@ -44,7 +46,8 @@ namespace distorter {
         .distortion = parameters.distortion.get(),
         .mix = parameters.mix.get(),
         .highPassFreq = parameters.highPassFreq.get(),
-        .saturationType = parameters.saturationType.getIndex()
+        .saturationType = parameters.saturationType.getIndex(),
+        .midControl = parameters.midControl.get()
       };
     }
   } // unnamed namespace 
@@ -90,6 +93,7 @@ juce::Result JsonSerializer::deserialize(juce::InputStream& input,
   parameters.mix = parsedParameters->mix;
   parameters.highPassFreq = parsedParameters->highPassFreq;
   parameters.saturationType = parsedParameters->saturationType;
+  parameters.midControl = parsedParameters->midControl;
 
   return juce::Result::ok();
 }
