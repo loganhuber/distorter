@@ -167,8 +167,8 @@ namespace distorter {
 
         juce::SmoothedValue<float> highGainDb = 1.0f;
         std::array<juce::dsp::IIR::Filter<float>, 2> highFilters;
-        const float highCenterFreqHz = 3000.0f;
-        const float highQ = 5.f;
+        const float highCenterFreqHz = 4000.0f;
+        const float highQ = 1.5f;
 
 
     }; 
