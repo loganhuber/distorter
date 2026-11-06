@@ -14,6 +14,10 @@ namespace distorter {
             midGainDb.setTargetValue(gainDb);
         }
 
+        void setHighGainDb(float gainDb) {
+            highGainDb.setTargetValue(gainDb);
+        }
+
         void setSaturationType(SaturationType saturationType) {
             flavor = saturationType;
         }
@@ -25,7 +29,7 @@ namespace distorter {
         void setDistortion(float driveDb) {
             outputDistortion.setTargetValue(juce::Decibels::decibelsToGain(driveDb));
 
-            const auto makeupDB = -0.6f * driveDb;
+            const auto makeupDB = -0.75f * driveDb;
             outputMakeupGain.setTargetValue(juce::Decibels::decibelsToGain(makeupDB));
         }
 
@@ -43,6 +47,7 @@ namespace distorter {
             outputMix.reset(sampleRate, 1);
             highPassFreq.reset(sampleRate, .1f);
             midGainDb.reset(sampleRate, .1f);
+            highGainDb.reset(sampleRate, .1f);
             sampleRateHz = sampleRate;
             outputMakeupGain.reset(sampleRate, 0.1f);
 
@@ -57,10 +62,23 @@ namespace distorter {
             highPassFilter.prepare(processSpec);
 
             midGainDb.setCurrentAndTargetValue(0.0f);
+            highGainDb.setCurrentAndTargetValue(0.0f);
 
             const float neutralGain = 1.0f;
 
-            auto coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            auto highCoefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf(
+                sampleRate,
+                highCenterFreqHz,
+                highQ,
+                neutralGain
+            );
+
+            for (auto& highFilter : highFilters) {
+                highFilter.coefficients = highCoefficients;
+                highFilter.prepare(processSpec);
+            }
+
+            auto midCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
                 sampleRate,
                 midCenterFreqHz,
                 midQ,
@@ -68,19 +86,27 @@ namespace distorter {
             );
 
             for (auto& midFilter : midFilters) {
-                midFilter.coefficients = coefficients;
+                midFilter.coefficients = midCoefficients;
                 midFilter.prepare(processSpec);
             }
+
             
         }
 
         void process(juce::AudioBuffer<float>& buffer) noexcept {
 
             midGainDb.skip(buffer.getNumSamples());
-            const float gainFactor = juce::Decibels::decibelsToGain(midGainDb.getCurrentValue());
+            const float midGainFactor = juce::Decibels::decibelsToGain(midGainDb.getCurrentValue());
 
             *midFilters[0].coefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
-                sampleRateHz, midCenterFreqHz, midQ, gainFactor
+                sampleRateHz, midCenterFreqHz, midQ, midGainFactor
+            );
+
+            highGainDb.skip(buffer.getNumSamples());
+            const float highGainFactor = juce::Decibels::decibelsToGain(highGainDb.getCurrentValue());
+
+            *highFilters[0].coefficients = juce::dsp::IIR::ArrayCoefficients<float>::makeHighShelf(
+                sampleRateHz, highCenterFreqHz, highQ, highGainFactor
             );
 
             for (const auto frameIndex : std::views::iota(0, buffer.getNumSamples())) {
@@ -96,8 +122,9 @@ namespace distorter {
                     
                     const auto inputSample = buffer.getSample(channelIndex, frameIndex);
                     const auto highPassed = highPassFilter.processSample(channelIndex, inputSample);
-                    const auto filtered = midFilters[static_cast<size_t>(channelIndex)].processSample(highPassed);
-                    
+                    const auto midProccessed = midFilters[static_cast<size_t>(channelIndex)].processSample(highPassed);
+                    const auto filtered = highFilters[static_cast<size_t>(channelIndex)].processSample(midProccessed);
+
                     auto shape = 0.0f;
 
                     switch (flavor) {
@@ -129,14 +156,19 @@ namespace distorter {
         juce::SmoothedValue<float> outputMakeupGain = 1.0f;
         juce::dsp::StateVariableTPTFilter<float> highPassFilter;
 
-        juce::SmoothedValue<float> midGainDb = 1.0f;
-        std::array<juce::dsp::IIR::Filter<float>, 2> midFilters;
+        SaturationType flavor = SaturationType::atan;
 
         double sampleRateHz = 0.0;
-        const float midCenterFreqHz = 2500.0f;
+
+        juce::SmoothedValue<float> midGainDb = 1.0f;
+        std::array<juce::dsp::IIR::Filter<float>, 2> midFilters;
+        const float midCenterFreqHz = 1000.0f;
         const float midQ = 1.f;
 
-        SaturationType flavor = SaturationType::atan;
+        juce::SmoothedValue<float> highGainDb = 1.0f;
+        std::array<juce::dsp::IIR::Filter<float>, 2> highFilters;
+        const float highCenterFreqHz = 3000.0f;
+        const float highQ = 5.f;
 
 
     }; 

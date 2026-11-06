@@ -80,6 +80,20 @@ namespace distorter {
             return addParameterToProcessor(processor, std::move(parameter));
         }
 
+        juce::AudioParameterFloat& createTrebleControlParameter(juce::AudioProcessor& processor) {
+            constexpr int versionHint = 1;
+
+            auto parameter = std::make_unique<juce::AudioParameterFloat>(
+                juce::ParameterID("High", versionHint),
+                "High",
+                juce::NormalisableRange{-12.f, 12.f, .1f},
+                0.f, 
+                juce::AudioParameterFloatAttributes{}.withLabel("dB")
+            );
+
+            return addParameterToProcessor(processor, std::move(parameter));
+        }
+
         juce::AudioParameterFloat& createMidControlParameter(juce::AudioProcessor& processor) {
             constexpr int versionHint = 1;
             
@@ -105,6 +119,7 @@ namespace distorter {
     mix{createMixParameter(processor)},
     highPassFreq{createHighPassFreqParameter(processor)},
     saturationType{createSaturationTypeParameter(processor)},
+    highControl{createTrebleControlParameter(processor)},
     midControl{createMidControlParameter(processor)}
     {
         juce::ignoreUnused(processor);

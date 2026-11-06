@@ -116,13 +116,16 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   // this code if your algorithm always overwrites all the output channels.
   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     buffer.clear(i, 0, buffer.getNumSamples());
-
-  distorter.setHighPass(parameters.highPassFreq.get());
-  distorter.setGain(parameters.gain.get());
-  distorter.setDistortion(parameters.distortion.get());
-  distorter.setMix(static_cast<float>(parameters.mix.get() / 100.0f));
-  distorter.setMidGainDb(parameters.midControl.get());
-  
+    
+    // distortion
+    distorter.setGain(parameters.gain.get());
+    distorter.setDistortion(parameters.distortion.get());
+    distorter.setMix(static_cast<float>(parameters.mix.get() / 100.0f));
+    
+    // EQ
+    distorter.setHighPass(parameters.highPassFreq.get());
+    distorter.setHighGainDb(parameters.highControl.get());
+    distorter.setMidGainDb(parameters.midControl.get());
 
   switch (parameters.saturationType.getIndex()) {
     case 0:
