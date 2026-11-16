@@ -28,8 +28,10 @@ END_JUCE_MODULE_DECLARATION
 #include "include/Parameters.h"
 
 #include <ranges>
+#include <DistorterBinaryData.h>
 
 #include "include/Distorter.h"
+#include "include/CabSimulator.h"
 #include "include/JsonSerializer.h"
 #include "include/PluginProcessor.h"
 #include "include/PluginEditor.h"

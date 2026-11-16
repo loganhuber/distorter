@@ -120,12 +120,25 @@ juce_add_plugin(
 # These definitions are recommended by JUCE
 target_compile_definitions(distorter_plugin PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
 
+
+
+
 # We want to have a "library" target with PluginProcessor and PluginEditor to use in plugins and in tests.
 # Library targets that use JUCE modules non-PRIVATEly should be created as JUCE module themselves,
 # not as static or shared libraries. Otherwise, you risk buggy JUCE build configuration.
 # This is unlikely on small projects, but we want to use the best practices from the start
 # (and migrating to JUCE modules at a late development stage is a nightmare, trust me).
 juce_add_module(distorter ALIAS_NAMESPACE distorter)
+
+
+juce_add_binary_data(distorter_resources
+  HEADER_NAME DistorterBinaryData.h
+  NAMESPACE DistorterBinaryData
+  SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resources/classic50impulse.wav"
+)
+
+target_link_libraries(distorter INTERFACE distorter_resources)
 
 # In the following, we re-export some of the compile-time definitions derived from arguments of
 # juce_add_plugin(). This is necessary to maintain consistent behavior in built plugins and in tests.

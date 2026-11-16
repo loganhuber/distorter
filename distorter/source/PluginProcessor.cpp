@@ -139,6 +139,9 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   }
 
   distorter.process(buffer);
+  juce::dsp::AudioBlock<float> block(buffer);
+  juce::dsp::ProcessContextReplacing<float> context(block);
+  cabSimulator.process(context);
 }
 
 bool PluginProcessor::hasEditor() const {
