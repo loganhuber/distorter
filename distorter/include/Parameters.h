@@ -14,6 +14,8 @@ namespace distorter {
             juce::AudioParameterFloat& highControl;
             juce::AudioParameterFloat& midControl;
 
+            juce::AudioParameterBool& cabSimBypassed;
+
         
             JUCE_DECLARE_NON_COPYABLE(Parameters)
             JUCE_DECLARE_NON_MOVEABLE(Parameters)

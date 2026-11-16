@@ -108,7 +108,17 @@ namespace distorter {
             return addParameterToProcessor(processor, std::move(parameter));
         }
 
+        juce::AudioParameterBool& createCabSimBypassedParameter(juce::AudioProcessor& processor) {
+            constexpr int versionHint = 1;
+            
+            auto parameter = std::make_unique<juce::AudioParameterBool>(
+                juce::ParameterID("Cab Sim Bypassed", versionHint),
+                "Bypass Cab Simulator",
+                false
+            );
 
+            return addParameterToProcessor(processor, std::move(parameter));
+        }
     }
 
 
@@ -120,7 +130,8 @@ namespace distorter {
     highPassFreq{createHighPassFreqParameter(processor)},
     saturationType{createSaturationTypeParameter(processor)},
     highControl{createTrebleControlParameter(processor)},
-    midControl{createMidControlParameter(processor)}
+    midControl{createMidControlParameter(processor)},
+    cabSimBypassed{createCabSimBypassedParameter(processor)}
     {
         juce::ignoreUnused(processor);
     }

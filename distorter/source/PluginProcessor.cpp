@@ -84,6 +84,7 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
 void PluginProcessor::releaseResources() {
   // When playback stops, you can use this as an opportunity to free up any
   // spare memory, etc.
+  cabSimulator.reset();
 }
 
 bool PluginProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const {
@@ -148,6 +149,11 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   }
 
   distorter.process(buffer);
+
+  if (parameters.cabSimBypassed.get()) {
+    return;
+  }
+  
   juce::dsp::AudioBlock<float> block(buffer);
   juce::dsp::ProcessContextReplacing<float> context(block);
   cabSimulator.process(context);
