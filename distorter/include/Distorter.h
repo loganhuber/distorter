@@ -41,7 +41,7 @@ namespace distorter {
             highPassFreq.setTargetValue(highPass);
         }
 
-        void prepare(double sampleRate, int expectedMaxFramesPerBlock, int numChannels) {
+        void prepare(double sampleRate, juce::dsp::ProcessSpec spec) {
             outputGain.reset(sampleRate, 0.1f);
             outputDistortion.reset(sampleRate, 0.1f);
             outputMix.reset(sampleRate, 1);
@@ -51,15 +51,9 @@ namespace distorter {
             sampleRateHz = sampleRate;
             outputMakeupGain.reset(sampleRate, 0.1f);
 
-            const juce::dsp::ProcessSpec processSpec {
-                .sampleRate = sampleRate,
-                .maximumBlockSize = static_cast<juce::uint32>(expectedMaxFramesPerBlock),
-                .numChannels = static_cast<juce::uint32>(numChannels),
-            };
-
             highPassFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
             highPassFilter.setCutoffFrequency(highPassFreq.getCurrentValue());
-            highPassFilter.prepare(processSpec);
+            highPassFilter.prepare(spec);
 
             midGainDb.setCurrentAndTargetValue(0.0f);
             highGainDb.setCurrentAndTargetValue(0.0f);
@@ -75,7 +69,7 @@ namespace distorter {
 
             for (auto& highFilter : highFilters) {
                 highFilter.coefficients = highCoefficients;
-                highFilter.prepare(processSpec);
+                highFilter.prepare(spec);
             }
 
             auto midCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
@@ -87,7 +81,7 @@ namespace distorter {
 
             for (auto& midFilter : midFilters) {
                 midFilter.coefficients = midCoefficients;
-                midFilter.prepare(processSpec);
+                midFilter.prepare(spec);
             }
 
             

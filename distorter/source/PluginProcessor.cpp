@@ -69,7 +69,16 @@ void PluginProcessor::changeProgramName(int index,
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
 
-  distorter.prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels());
+  
+  const juce::dsp::ProcessSpec spec {
+    .sampleRate = sampleRate,
+    .maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock),
+    .numChannels = static_cast<juce::uint32>(getTotalNumInputChannels()),
+  };
+  
+  distorter.prepare(sampleRate, spec);
+  cabSimulator.prepare(spec);
+  cabSimulator.reset();
 }
 
 void PluginProcessor::releaseResources() {

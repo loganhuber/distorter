@@ -9,10 +9,10 @@ namespace distorter {
             auto& convolution = processorChain.get<convolutionIndex>();
 
             convolution.loadImpulseResponse(
-                DistorterBinaryData::classic50impulse_wav,
-                static_cast<size_t>(DistorterBinaryData::classic50impulse_wavSize),
-                juce::dsp::Convolution::Stereo::yes,
-                juce::dsp::Convolution::Trim::no,
+                DistorterBinaryData::marshallImpulse_wav,
+                static_cast<size_t>(DistorterBinaryData::marshallImpulse_wavSize),
+                juce::dsp::Convolution::Stereo::no,
+                juce::dsp::Convolution::Trim::yes,
                 0);
         }
 

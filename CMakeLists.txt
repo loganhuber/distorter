@@ -136,6 +136,7 @@ juce_add_binary_data(distorter_resources
   NAMESPACE DistorterBinaryData
   SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/Resources/classic50impulse.wav"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resources/marshallImpulse.wav"
 )
 
 target_link_libraries(distorter INTERFACE distorter_resources)
