@@ -136,7 +136,8 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     distorter.setHighPass(parameters.highPassFreq.get());
     distorter.setHighGainDb(parameters.highControl.get());
     distorter.setMidGainDb(parameters.midControl.get());
-
+  
+    // choose distortion type
   switch (parameters.saturationType.getIndex()) {
     case 0:
       distorter.setSaturationType(Distorter::SaturationType::atan);
@@ -148,12 +149,23 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
       distorter.setSaturationType(Distorter::SaturationType::heavy);
   }
 
+  // choose cab sim type
+  switch (parameters.cabOption.getIndex()) {
+    case 0:
+      cabSimulator.setCabType(CabSimulator::CabType::peavey);
+      break;
+    case 1:
+      cabSimulator.setCabType(CabSimulator::CabType::marshall);
+      break;
+  }
+
   distorter.process(buffer);
 
+  // TODO smooth this transition
   if (parameters.cabSimBypassed.get()) {
     return;
   }
-  
+
   juce::dsp::AudioBlock<float> block(buffer);
   juce::dsp::ProcessContextReplacing<float> context(block);
   cabSimulator.process(context);

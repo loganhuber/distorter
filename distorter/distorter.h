@@ -28,6 +28,7 @@ END_JUCE_MODULE_DECLARATION
 #include "include/Parameters.h"
 
 #include <ranges>
+#include <atomic>
 #include <DistorterBinaryData.h>
 
 #include "include/Distorter.h"

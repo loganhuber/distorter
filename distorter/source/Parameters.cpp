@@ -119,6 +119,19 @@ namespace distorter {
 
             return addParameterToProcessor(processor, std::move(parameter));
         }
+
+        juce::AudioParameterChoice& createCabOptionParameter(juce::AudioProcessor& processor) {
+            constexpr int versionHint = 1;
+
+            auto parameter = std::make_unique<juce::AudioParameterChoice>(
+                juce::ParameterID("Cab Choice", versionHint),
+                "Cabinet",
+                juce::StringArray({"Peavey Classic 50", "Marshall"}),
+                0
+            );
+
+            return addParameterToProcessor(processor, std::move(parameter));
+        }
     }
 
 
@@ -131,7 +144,8 @@ namespace distorter {
     saturationType{createSaturationTypeParameter(processor)},
     highControl{createTrebleControlParameter(processor)},
     midControl{createMidControlParameter(processor)},
-    cabSimBypassed{createCabSimBypassedParameter(processor)}
+    cabSimBypassed{createCabSimBypassedParameter(processor)},
+    cabOption{createCabOptionParameter(processor)}
     {
         juce::ignoreUnused(processor);
     }
